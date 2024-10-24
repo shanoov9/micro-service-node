@@ -1,0 +1,43 @@
+service: user-comments-service # Service name
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1              # Specify your region
+  environment:
+    DB_HOST: localhost
+    DB_USER: root
+    DB_PASSWORD: root
+    DB_NAME: pokemon
+    
+functions:
+  createUser:
+    handler: handlers/userCtrl.createUser  # Lambda function to create a user
+    events:
+      - http:
+          path: users
+          method: post
+  createComment:
+    handler: handlers/commentCtrl.createComment  # Lambda function to create a comment
+    events:
+      - http:
+          path: comments
+          method: post
+  getUserComments:
+    handler: handlers/commentCtrl.getUserComments  # Lambda function to get user comments
+    events:
+      - http:
+          path: users/{userId}/comments
+          method: get
+
+plugins:
+  - serverless-dotenv-plugin  # To use environment variables from a .env file
+  - serverless-offline 
+
+package:
+  exclude:
+    - node_modules/**
+  include:
+    - models/**
+    - configs/**
+    - handlers/**
